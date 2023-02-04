@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JWTManager.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace JWTManager
     {
         public string GenerateJwt(string username);
         public bool ValidateJwt(string token);
-        public JwtManager DeserializeToken(string token);
+
+        public JwtPayload GetPayload(string token);
     }
 }
