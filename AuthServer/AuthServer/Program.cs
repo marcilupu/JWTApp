@@ -1,7 +1,13 @@
+using JWTManager;
+using System.Security.Cryptography.X509Certificates;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add Authorization Server Manager Service
+builder.Services.AddSingleton<IJwtManager, JwtManager>(service => new JwtManager(new X509Certificate2("cert.pfx", "1234")));
 
 var app = builder.Build();
 
