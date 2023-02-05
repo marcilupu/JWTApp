@@ -1,4 +1,5 @@
 using AuthServer.Database;
+using AuthServer.Database.Repositories;
 using JWTManager;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,9 @@ builder.Services.AddSwaggerGen();
 // Add Authorization Server Manager Service
 builder.Services.AddSingleton<IJwtManager, JwtManager>(service => new JwtManager(new X509Certificate2("cert.pfx", "1234")));
 builder.Services.AddDbContext<AuthServerContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddDbContext<AuthServerContext>();
+builder.Services.AddScoped<UserRepository, UserRepository>();
 
 var app = builder.Build();
 
