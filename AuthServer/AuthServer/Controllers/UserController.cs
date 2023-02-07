@@ -23,7 +23,7 @@ namespace AuthServer.Controllers
         }
 
         [HttpGet]
-        public IActionResult GenerateToken([FromQuery] AuthServer.Models.User user, [FromServices] IJwtManager jwtmanager, [FromServices] UserRepository userRepository)
+        public IActionResult GenerateToken([FromQuery] AuthServer.Models.User user, [FromServices] IJwtManager jwtManager, [FromServices] UserRepository userRepository)
         {
             //check the username and password
             User dbUser = userRepository.GetUser(user.Id);
@@ -31,7 +31,7 @@ namespace AuthServer.Controllers
             if (user.Username == dbUser.Username && PasswordHandler.ValidatePassword(user.Password, dbUser.Password, dbUser.Salt))
             {
                 //generate token
-                string token = jwtmanager.GenerateJwt(user.Username);
+                string token = jwtManager.GenerateJwt(user.Username, DateTime.Now.AddMinutes(20));
 
                 return new JsonResult(token);
             }

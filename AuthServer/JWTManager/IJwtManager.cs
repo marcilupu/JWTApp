@@ -1,17 +1,8 @@
-﻿using JWTManager.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace JWTManager
+﻿namespace JWTManager
 {
     public interface IJwtManager
     {
-        public string GenerateJwt(string username);
+        public string GenerateJwt(string username, DateTime expiresAt);
         public bool ValidateJwt(string token);
-
-        public JwtPayload GetPayload(string token);
     }
 }

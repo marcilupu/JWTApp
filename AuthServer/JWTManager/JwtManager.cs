@@ -21,14 +21,14 @@ namespace JWTManager
             _jwtHeader = new JwtHeader() { Algorithm = "RS256", Type = "JWT" };
         }
 
-        // Generate a new jwt token.
-        public string GenerateJwt(string username)
+        // Generate new JWT token.
+        public string GenerateJwt(string username, DateTime expiresAt)
         {
             // Cryptographic algorithm used for signature is RSA signature with SHA-256(RS256).
             string jwtHeaderJson = JsonConvert.SerializeObject(_jwtHeader);
             string base64JwtHeader = Convert.ToBase64String(Encoding.UTF8.GetBytes(jwtHeaderJson));
 
-            JwtPayload jwtPayload = new JwtPayload() { Username = username };
+            JwtPayload jwtPayload = new JwtPayload() { Username = username, ExpiresAt = expiresAt };
             string jwtPayloadJson = JsonConvert.SerializeObject(jwtPayload);
             string base64JwtPayload = Convert.ToBase64String(Encoding.UTF8.GetBytes(jwtPayloadJson));
 
@@ -42,15 +42,30 @@ namespace JWTManager
             return token;
         }
 
-        // Denissa
+        // Verify existing JWT token
         public bool ValidateJwt(string token)
         {
-            // Ca sa verifici semnatura
-            //bool isValid = cert.GetRSAPublicKey()!.VerifyData(dataToSign, signature, algorithmUsed, paddingUsed);
-            return true;
-        }
+            string[] tokenData = token.Split('.');
+            string base64JwtHeader = tokenData[0];
+            string base64JwtPayload = tokenData[1];
+            string base64JwtSignature = tokenData[2];
 
-        // Serialize the jwt token.
-        public JwtPayload GetPayload(string token) { return null; }
+            byte[] dataToVerify = Encoding.ASCII.GetBytes(base64JwtHeader + "." + base64JwtPayload);
+            byte[] signedData = Encoding.ASCII.GetBytes(base64JwtSignature);
+
+            bool isValid = _certificate.GetRSAPublicKey()!.VerifyData(dataToVerify, signedData, _algorithm, _padding);
+
+            // if the token isValid the payload cannot be null
+            if (isValid)
+            {
+                string jwtPayloadJson = Encoding.ASCII.GetBytes(base64JwtPayload).ToString()!;
+                JwtPayload jwtPayload = (JwtPayload)JsonConvert.DeserializeObject(jwtPayloadJson, typeof(JwtPayload))!;
+                return (jwtPayload.ExpiresAt > DateTime.Now) ? true : false;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }
