@@ -3,6 +3,7 @@ using AuthServer.Models;
 using AuthServer.Utils;
 using JWTManager;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using User = AuthServer.Database.Models.User;
 
 namespace AuthServer.Controllers
@@ -27,53 +28,58 @@ namespace AuthServer.Controllers
             await userRepository.AddUserAsync(user);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetToken([FromQuery] string? authorizationCode, [FromServices] IJwtManager jwtManager, [FromServices] UserRepository userRepository)
+        [HttpGet("GetToken")]
+        public async Task<IActionResult> GetToken([FromQuery] string authorizationCode, [FromServices] IJwtManager jwtManager, [FromServices] UserRepository userRepository)
         {
             //check the username and password
             User? dbUser = await userRepository.GetUserByCode(authorizationCode);
 
             if(dbUser == null)
             {
-                throw new NullReferenceException("The user does not exists!");
+                return BadRequest();  
             }
 
             //generate token
-            string token = jwtManager.GenerateJwt(dbUser.Username, DateTime.Now.AddMinutes(20));
+            string token = jwtManager.GenerateJwt(dbUser.Username, DateTime.Now.AddDays(1));
 
             // set authorization header
             HttpContext.Response.Headers.Authorization = new StringValues(new[] { "Bearer", token });
 
-            return new OkResult();
+            return Ok();
         }
 
         [HttpGet("Login")]
-        public IActionResult Login([FromQuery] string? redirectUrl, [FromServices] IJwtManager jwtManager) => View(null, redirectUrl);
+        public IActionResult Login([FromQuery] string redirectUrl, [FromServices] IJwtManager jwtManager) => View(null, redirectUrl);
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginForm loginForm, [FromServices] IJwtManager jwtManager, [FromServices] UserRepository userRepository)
         {
-            //Generate a random code
-            string code = Guid.NewGuid().ToString();
-
+          
             //Get the user with the related username from db.
             User? dbUser = await userRepository.GetUserAsync(loginForm.Username);
 
             if (dbUser == null)
             {
-                throw new NullReferenceException("The user does not exists");
+                return BadRequest();
             }
+            
+            // Validate username and password
+            if (loginForm.Username == dbUser.Username && PasswordHandler.ValidatePassword(loginForm.Password, dbUser.Password, dbUser.Salt))
+            { 
+                //Generate a random code
+                string code = Guid.NewGuid().ToString();
 
-            if (loginForm.Username == dbUser.Username && PasswordHandler.ValidatePassword(loginForm.PasswordHash, dbUser.Password, dbUser.Salt))
-            {
+                // update the user's code in db.
                 dbUser.Code = code;
 
-                await userRepository.UpdateAsync(dbUser);
-
-                return Redirect(loginForm.RedirectUrl + "?authorizationCode=" + code);
+                if (await userRepository.UpdateAsync(dbUser))
+                {
+                    // redirect to the redirectUrl
+                    return Redirect(loginForm.RedirectUrl + "?authorizationCode=" + code);
+                }
             }
 
-            return new BadRequestResult();
+            return BadRequest();
         }
     }
 }

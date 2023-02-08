@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using JWTManager;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using ResourceServer.Filters;
 using ResourceServer.Utils;
+using System.Net.Http;
 
 namespace ResourceServer.Controllers
 {
@@ -10,31 +14,15 @@ namespace ResourceServer.Controllers
             return View();
         }
 
+        [JwtAuthorization]
         public async Task<IActionResult> Privacy()
         {
-            string authQueryCode = HttpContext.Request.Query["authorizationCode"];
+            var token = HttpContext.Items["jwt"];
 
-            HttpClient client = new HttpClient();
-            var response = await client.GetAsync("https://localhost:7186/user/gettoken?authorizationCode=" + authQueryCode);
+            // aici ar trebui o deserializare facuta la token ca sa fie afisat username-ul in view.
 
-            string token = response.Headers.GetValues("Authorization").ToString();
-
-            if(token != null)
-            {
-                return View();
-            }
-            
-            //if(jwt and jwt is valid)
-            //return Privacy View
-            //if is not valid return BadRequest
-            //else return Redirect()
-            return Redirect("https://localhost:7186/User/login?redirectUrl=https://localhost:7109/Home/Privacy");
+            return View();             
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
     }
 }
