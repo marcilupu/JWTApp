@@ -56,13 +56,14 @@ namespace AuthServer.Controllers
         public async Task<IActionResult> Login(LoginForm loginForm, [FromServices] IJwtManager jwtManager, [FromServices] UserRepository userRepository)
         {
             //validate user, password cu db
-            User dbUser = userRepository.GetUser(loginForm.Username);
+            //User dbUser = userRepository.GetUser(loginForm.Username);
 
-            if (loginForm.Username == dbUser.Username && PasswordHandler.ValidatePassword(loginForm.PasswordHash, dbUser.Password, dbUser.Salt))
-            {
-                //generate token
-                string tokentest = jwtManager.GenerateJwt(loginForm.Username, DateTime.Now.AddMinutes(20));
-            }
+            //if (loginForm.Username == dbUser.Username && PasswordHandler.ValidatePassword(loginForm.PasswordHash, dbUser.Password, dbUser.Salt))
+            //{
+            //    //generate token
+            //    string tokentest = jwtManager.GenerateJwt(loginForm.Username, DateTime.Now.AddMinutes(20));
+            //}
+
             //if valid generate jwt cu username ul respectiv, post, redirect
             string token = jwtManager.GenerateJwt(loginForm.Username, DateTime.Now.AddMinutes(20));
 
