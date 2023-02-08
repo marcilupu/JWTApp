@@ -19,5 +19,12 @@ namespace AuthServer.Database.Repositories
         public User GetUser(int id) {
             return _context.Users.FirstOrDefault(item => item.Id == id);
         }
+
+        public List<User> GetAll() => _context.Users.Select(x => x).ToList();
+
+        public User GetUser(string username)
+        {
+            return _context.Users.FirstOrDefault(item => item.Username == username);
+        }
     }
 }

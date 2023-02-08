@@ -21,7 +21,13 @@ namespace AuthServer.Controllers
             string salt = PasswordHandler.GenerateSalt();
             string passwordhash = PasswordHandler.ComputePassword(password, salt);
 
-            User user = new User() { Username = username, Password = passwordhash, Salt = salt};
+            List<User> users = userRepository.GetAll();
+            if (users.Any(users => users.Username == username))
+            {
+                throw new Exception("A username with this name already exists");
+            }
+
+            User user = new User() { Username = username, Password = passwordhash, Salt = salt };
 
             userRepository.AddUser(user);
         }
@@ -47,9 +53,16 @@ namespace AuthServer.Controllers
         public IActionResult Login([FromQuery] string? redirectUrl, [FromServices] IJwtManager jwtManager) => View(null, redirectUrl);
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login(LoginForm loginForm, [FromServices] IJwtManager jwtManager)
+        public async Task<IActionResult> Login(LoginForm loginForm, [FromServices] IJwtManager jwtManager, [FromServices] UserRepository userRepository)
         {
             //validate user, password cu db
+            User dbUser = userRepository.GetUser(loginForm.Username);
+
+            if (loginForm.Username == dbUser.Username && PasswordHandler.ValidatePassword(loginForm.PasswordHash, dbUser.Password, dbUser.Salt))
+            {
+                //generate token
+                string tokentest = jwtManager.GenerateJwt(loginForm.Username, DateTime.Now.AddMinutes(20));
+            }
             //if valid generate jwt cu username ul respectiv, post, redirect
             string token = jwtManager.GenerateJwt(loginForm.Username, DateTime.Now.AddMinutes(20));
 
