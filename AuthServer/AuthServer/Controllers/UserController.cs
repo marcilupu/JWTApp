@@ -22,7 +22,7 @@ namespace AuthServer.Controllers
         {
             string salt = PasswordHandler.GenerateSalt();
             string passwordhash = PasswordHandler.ComputePassword(password, salt);
-            
+
             if (await userRepository.AnyAsync(username))
             {
                 throw new Exception("A username with this name already exists");
@@ -34,20 +34,23 @@ namespace AuthServer.Controllers
         }
 
         [HttpGet]
-        public IActionResult GenerateToken([FromQuery] AuthServer.Models.User user, [FromServices] IJwtManager jwtManager, [FromServices] UserRepository userRepository)
+        public async Task<IActionResult> GetToken([FromQuery] string? authorizationCode, [FromServices] IJwtManager jwtManager, [FromServices] UserRepository userRepository)
         {
             //check the username and password
-            User dbUser = userRepository.GetUser(user.Id);
+            User? dbUser = await userRepository.GetUserByCode(authorizationCode);
 
-            if (user.Username == dbUser.Username && PasswordHandler.ValidatePassword(user.Password, dbUser.Password, dbUser.Salt))
+            if(dbUser == null)
             {
-                //generate token
-                string token = jwtManager.GenerateJwt(user.Username, DateTime.Now.AddMinutes(20));
-
-                return new JsonResult(token);
+                throw new NullReferenceException("The user does not exists!");
             }
 
-            else return new BadRequestResult();
+            //generate token
+            string token = jwtManager.GenerateJwt(dbUser.Username, DateTime.Now.AddMinutes(20));
+
+            // set authorization header
+            HttpContext.Response.Headers.Authorization = new StringValues(new[] { "Bearer", token });
+
+            return new OkResult();
         }
 
         [HttpGet("Login")]
@@ -56,26 +59,27 @@ namespace AuthServer.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginForm loginForm, [FromServices] IJwtManager jwtManager, [FromServices] UserRepository userRepository)
         {
-            //validate user, password cu db
-            //User dbUser = userRepository.GetUser(loginForm.Username);
+            //Generate a random code
+            string code = Guid.NewGuid().ToString();
 
-            //if (loginForm.Username == dbUser.Username && PasswordHandler.ValidatePassword(loginForm.PasswordHash, dbUser.Password, dbUser.Salt))
-            //{
-            //    //generate token
-            //    string tokentest = jwtManager.GenerateJwt(loginForm.Username, DateTime.Now.AddMinutes(20));
-            //}
+            //Get the user with the related username from db.
+            User? dbUser = await userRepository.GetUserAsync(loginForm.Username);
 
-            //if valid generate jwt cu username ul respectiv, post, redirect
-            //string token = jwtManager.GenerateJwt(loginForm.Username, DateTime.Now.AddMinutes(20));
+            if (dbUser == null)
+            {
+                throw new NullReferenceException("The user does not exists");
+            }
 
-            //using var client = new HttpClient();
-            //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            //var response = await client.PostAsync(loginForm.RedirectUrl, null);
+            if (loginForm.Username == dbUser.Username && PasswordHandler.ValidatePassword(loginForm.PasswordHash, dbUser.Password, dbUser.Salt))
+            {
+                dbUser.Code = code;
 
-            //HttpContext.Response.Headers.Authorization = new StringValues(new[] { "Bearer", token });
+                await userRepository.UpdateAsync(dbUser);
 
-            return Redirect(loginForm.RedirectUrl + "?authorizationCode=" + Guid.NewGuid().ToString());
-            //if not valid warning in view credentiale incorecte
+                return Redirect(loginForm.RedirectUrl + "?authorizationCode=" + code);
+            }
+
+            return new BadRequestResult();
         }
     }
 }

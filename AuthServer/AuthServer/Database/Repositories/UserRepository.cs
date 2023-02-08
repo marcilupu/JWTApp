@@ -14,10 +14,20 @@ namespace AuthServer.Database.Repositories
         public async Task AddUserAsync(User user)
         {
             await _context.Users.AddAsync(user);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public User GetUser(int id) {
+        public async Task UpdateAsync(User user)
+        {
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<User?> GetUserByCode(string code)
+        {
+            return await _context.Users.FirstOrDefaultAsync(x => x.Code == code);
+        }
+
+        public User? GetUser(int id) {
             return _context.Users.FirstOrDefault(item => item.Id == id);
 
         }
@@ -27,9 +37,9 @@ namespace AuthServer.Database.Repositories
 
         public List<User> GetAll() => _context.Users.Select(x => x).ToList();
 
-        public async Task<User> GetUserAsync(string username)
+        public async Task<User?> GetUserAsync(string username)
         {
-            return await _context.Users.FirstOrDefaultAsync(item => item.Username == username);
+            return await _context.Users.AsTracking(QueryTrackingBehavior.TrackAll).FirstOrDefaultAsync(item => item.Username == username);
         }
     }
 }
