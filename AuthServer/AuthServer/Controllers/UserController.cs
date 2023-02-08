@@ -18,19 +18,19 @@ namespace AuthServer.Controllers
     {
 
         [HttpPost]
-        public void AddUser([FromServices] UserRepository userRepository, string username, string password)
+        public async Task AddUser([FromServices] UserRepository userRepository, string username, string password)
         {
             string salt = PasswordHandler.GenerateSalt();
             string passwordhash = PasswordHandler.ComputePassword(password, salt);
-
-            if (userRepository.Any(username))
+            
+            if (await userRepository.AnyAsync(username))
             {
                 throw new Exception("A username with this name already exists");
             }
 
             User user = new User() { Username = username, Password = passwordhash, Salt = salt };
 
-            userRepository.AddUser(user);
+            await userRepository.AddUserAsync(user);
         }
 
         [HttpGet]
