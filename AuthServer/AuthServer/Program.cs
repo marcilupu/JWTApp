@@ -1,11 +1,12 @@
 using AuthServer.Database;
 using AuthServer.Database.Repositories;
 using JWTManager;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -28,7 +29,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
-   
+
 }
 if (app.Environment.IsDevelopment())
 {
@@ -40,6 +41,13 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseCors(builder =>
+{
+    builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
+});
 
 app.UseAuthorization();
 

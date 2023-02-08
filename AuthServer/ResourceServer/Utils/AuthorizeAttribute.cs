@@ -15,7 +15,7 @@ namespace ResourceServer.Utils
 
             var jwtManager = context.HttpContext.RequestServices.GetRequiredService<IJwtManager>();
 
-            if (token == null ||  !jwtManager.ValidateJwt(token))
+            if (token == null || !jwtManager.ValidateJwt(token))
             {
                 QueryBuilder queryBuilder = new QueryBuilder();
                 queryBuilder.Add("redirectUrl", context.HttpContext.Request.GetEncodedUrl());

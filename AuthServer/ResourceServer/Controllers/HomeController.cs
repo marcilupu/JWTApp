@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ResourceServer.Models;
 using ResourceServer.Utils;
-using System.Diagnostics;
 
 namespace ResourceServer.Controllers
 {

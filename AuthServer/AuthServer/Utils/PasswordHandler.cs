@@ -28,7 +28,7 @@ namespace AuthServer.Utils
         {
             string dbPasswordHash = ComputePassword(password, salt);
 
-            if(dbPassword == dbPasswordHash) { return true; }
+            if (dbPassword == dbPasswordHash) { return true; }
 
             return false;
         }
