@@ -1,18 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ResourceServer.Models;
-using System.Diagnostics;
+using ResourceServer.Utils;
 
 namespace ResourceServer.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
         public IActionResult Index()
         {
             return View();

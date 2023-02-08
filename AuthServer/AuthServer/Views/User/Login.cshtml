@@ -1,9 +1,15 @@
 ﻿@model string
 <form method="post" action="login">
-	<label for="username">Username</label>
-	<input name="username" type="text" />
-	<label for="password">Password</label>
-	<input name="password" type="password" />
-	<input name="redirectUrl" type="hidden" value="@Model" />
-	<input type="submit" value="Submit" />
+    <div class="txt_field">
+        <input type="text" name="username" required>
+        <span></span>
+        <label for="username">Username</label>
+    </div>
+    <div class="txt_field">
+        <input type="password" name="password" required>
+        <span></span>
+        <label for="password">Password</label>
+    </div>
+    <input type="submit" value="Submit">
 </form>
+

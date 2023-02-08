@@ -1,14 +1,8 @@
-﻿using AuthServer.Database.Models;
-using AuthServer.Database.Repositories;
+﻿using AuthServer.Database.Repositories;
 using AuthServer.Models;
 using AuthServer.Utils;
-using Azure.Core;
 using JWTManager;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.Net.Http.Headers;
-using System.Net.Http.Headers;
 using User = AuthServer.Database.Models.User;
 
 namespace AuthServer.Controllers
