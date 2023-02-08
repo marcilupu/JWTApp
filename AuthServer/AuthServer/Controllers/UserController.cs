@@ -1,12 +1,9 @@
-﻿using AuthServer.Database.Models;
-using AuthServer.Database.Repositories;
+﻿using AuthServer.Database.Repositories;
 using AuthServer.Models;
 using AuthServer.Utils;
-using Azure.Core;
 using JWTManager;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.Net.Http.Headers;
 using System.Net.Http.Headers;
 using User = AuthServer.Database.Models.User;
 
@@ -21,7 +18,7 @@ namespace AuthServer.Controllers
             string salt = PasswordHandler.GenerateSalt();
             string passwordhash = PasswordHandler.ComputePassword(password, salt);
 
-            User user = new User() { Username = username, Password = passwordhash, Salt = salt};
+            User user = new User() { Username = username, Password = passwordhash, Salt = salt };
 
             userRepository.AddUser(user);
         }
@@ -53,11 +50,14 @@ namespace AuthServer.Controllers
             //if valid generate jwt cu username ul respectiv, post, redirect
             string token = jwtManager.GenerateJwt(loginForm.Username, DateTime.Now.AddMinutes(20));
 
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var response = await client.PostAsync(loginForm.RedirectUrl, null);
+            HttpContext.Response.Cookies.Append("naughty-shawty-access-token", token, new CookieOptions { IsEssential = true, HttpOnly = true, SameSite = SameSiteMode.Strict});
 
-            return new RedirectResult(loginForm.RedirectUrl);
+            var html = $@"
+             <html><head>
+                <meta http-equiv='refresh' content='0;url={loginForm.RedirectUrl}' />
+             </head></html>";
+
+            return Content(html, "text/html");
             //if not valid warning in view credentiale incorecte
         }
     }
