@@ -1,4 +1,5 @@
 ﻿using AuthServer.Database.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuthServer.Database.Repositories
 {
@@ -10,9 +11,9 @@ namespace AuthServer.Database.Repositories
             _context = context;
         }
 
-        public void AddUser(User user)
+        public async Task AddUserAsync(User user)
         {
-            _context.Users.Add(user);
+            await _context.Users.AddAsync(user);
             _context.SaveChanges();
         }
 
@@ -20,11 +21,13 @@ namespace AuthServer.Database.Repositories
             return _context.Users.FirstOrDefault(item => item.Id == id);
         }
 
+        public async Task<bool> AnyAsync(string username) => await _context.Users.AnyAsync(user => user.Username == username);
+
         public List<User> GetAll() => _context.Users.Select(x => x).ToList();
 
-        public User GetUser(string username)
+        public async Task<User> GetUserAsync(string username)
         {
-            return _context.Users.FirstOrDefault(item => item.Username == username);
+            return await _context.Users.FirstOrDefaultAsync(item => item.Username == username);
         }
     }
 }
