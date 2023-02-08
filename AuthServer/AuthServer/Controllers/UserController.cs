@@ -26,23 +26,6 @@ namespace AuthServer.Controllers
             await userRepository.AddUserAsync(user);
         }
 
-        [HttpGet]
-        public IActionResult GenerateToken([FromQuery] AuthServer.Models.User user, [FromServices] IJwtManager jwtManager, [FromServices] UserRepository userRepository)
-        {
-            //check the username and password
-            User? dbUser = userRepository.GetUser(user.Id);
-
-            if (dbUser != null && user.Username == dbUser.Username && PasswordHandler.ValidatePassword(user.Password, dbUser.Password, dbUser.Salt))
-            {
-                //generate token
-                string token = jwtManager.GenerateJwt(user.Username, DateTime.Now.AddMinutes(20));
-
-                return new JsonResult(token);
-            }
-
-            else return new BadRequestResult();
-        }
-
         [HttpGet("Login")]
         public IActionResult Login([FromQuery] string? redirectUrl, [FromServices] IJwtManager jwtManager) => View(null, redirectUrl);
 
@@ -51,7 +34,7 @@ namespace AuthServer.Controllers
         {
             var dbUser = await userRepository.GetUserAsync(loginForm.Username);
 
-            if (dbUser != null && PasswordHandler.ValidatePassword(loginForm.PasswordHash, dbUser.Password, dbUser.Salt))
+            if (dbUser != null && PasswordHandler.ValidatePassword(loginForm.Password, dbUser.Password, dbUser.Salt))
             {
                 string token = jwtManager.GenerateJwt(loginForm.Username, DateTime.Now.AddMinutes(20));
 
