@@ -17,7 +17,8 @@ namespace AuthServer.Database.Repositories
             _context.SaveChanges();
         }
 
-        public User GetUser(int id) {
+        public User? GetUser(int id)
+        {
             return _context.Users.FirstOrDefault(item => item.Id == id);
         }
 
@@ -25,7 +26,7 @@ namespace AuthServer.Database.Repositories
 
         public List<User> GetAll() => _context.Users.Select(x => x).ToList();
 
-        public async Task<User> GetUserAsync(string username)
+        public async Task<User?> GetUserAsync(string username)
         {
             return await _context.Users.FirstOrDefaultAsync(item => item.Username == username);
         }
