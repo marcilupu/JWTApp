@@ -1,15 +1,19 @@
 ﻿using AuthServer.Database.Models;
 using AuthServer.Database.Repositories;
+using AuthServer.Models;
 using AuthServer.Utils;
+using Azure.Core;
 using JWTManager;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.Net.Http.Headers;
+using System.Net.Http.Headers;
+using User = AuthServer.Database.Models.User;
 
 namespace AuthServer.Controllers
 {
-    [ApiController]
     [Route("[controller]")]
-    public class UserController : ControllerBase
+    public class UserController : Controller
     {
         [HttpPost]
         public void AddUser([FromServices] UserRepository userRepository, string username, string password)
@@ -37,6 +41,24 @@ namespace AuthServer.Controllers
             }
 
             else return new BadRequestResult();
+        }
+
+        [HttpGet("Login")]
+        public IActionResult Login([FromQuery] string? redirectUrl, [FromServices] IJwtManager jwtManager) => View(null, redirectUrl);
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login(LoginForm loginForm, [FromServices] IJwtManager jwtManager)
+        {
+            //validate user, password cu db
+            //if valid generate jwt cu username ul respectiv, post, redirect
+            string token = jwtManager.GenerateJwt(loginForm.Username, DateTime.Now.AddMinutes(20));
+
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var response = await client.PostAsync(loginForm.RedirectUrl, null);
+
+            return new RedirectResult(loginForm.RedirectUrl);
+            //if not valid warning in view credentiale incorecte
         }
     }
 }

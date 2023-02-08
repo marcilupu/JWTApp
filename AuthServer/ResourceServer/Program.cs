@@ -1,7 +1,12 @@
+using JWTManager;
+using System.Security.Cryptography.X509Certificates;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+var certPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\..\..\cert.pfx"));
+builder.Services.AddSingleton<IJwtManager, JwtManager>(service => new JwtManager(new X509Certificate2(certPath, "1234")));
 
 var app = builder.Build();
 

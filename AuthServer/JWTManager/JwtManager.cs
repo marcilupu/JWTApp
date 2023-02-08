@@ -51,14 +51,14 @@ namespace JWTManager
             string base64JwtSignature = tokenData[2];
 
             byte[] dataToVerify = Encoding.ASCII.GetBytes(base64JwtHeader + "." + base64JwtPayload);
-            byte[] signedData = Encoding.ASCII.GetBytes(base64JwtSignature);
+            byte[] signedData = Convert.FromBase64String(base64JwtSignature);
 
             bool isValid = _certificate.GetRSAPublicKey()!.VerifyData(dataToVerify, signedData, _algorithm, _padding);
 
             // if the token isValid the payload cannot be null
             if (isValid)
             {
-                string jwtPayloadJson = Encoding.ASCII.GetBytes(base64JwtPayload).ToString()!;
+                string jwtPayloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(base64JwtPayload));
                 JwtPayload jwtPayload = (JwtPayload)JsonConvert.DeserializeObject(jwtPayloadJson, typeof(JwtPayload))!;
                 return (jwtPayload.ExpiresAt > DateTime.Now) ? true : false;
             }

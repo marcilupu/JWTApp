@@ -13,7 +13,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add Authorization Server Manager Service
-builder.Services.AddSingleton<IJwtManager, JwtManager>(service => new JwtManager(new X509Certificate2("cert.pfx", "1234")));
+var certPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\cert.pfx"));
+builder.Services.AddSingleton<IJwtManager, JwtManager>(service => new JwtManager(new X509Certificate2(certPath, "1234")));
 builder.Services.AddDbContext<AuthServerContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<AuthServerContext>();
