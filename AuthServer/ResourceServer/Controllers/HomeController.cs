@@ -18,13 +18,29 @@ namespace ResourceServer.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public async Task<IActionResult> Privacy()
         {
+
+            string authHeader = HttpContext.Request.Query["authorizationCode"];
+
+
+
+            HttpClient client = new HttpClient();
+            var response = await client.GetAsync("serverautorizare/gettoken");
+
+
+            string token = response.Headers.GetValues("Authorization").ToString();
+
+            if(authHeader != null)
+            {
+                return View();
+            }
+            
             //if(jwt) and jwt is valid
             //return Privacy
             //if is not valid return BadRequest
             //else return Redirect()
-            return View();
+            return Redirect("https://localhost:7186/User/login?redirectUrl=https://localhost:7109/Home/Privacy");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

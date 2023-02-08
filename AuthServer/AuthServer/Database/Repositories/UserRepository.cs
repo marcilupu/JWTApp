@@ -20,6 +20,8 @@ namespace AuthServer.Database.Repositories
             return _context.Users.FirstOrDefault(item => item.Id == id);
         }
 
+        public bool Any(string username) => _context.Users.Any(x => x.Username == username);
+
         public List<User> GetAll() => _context.Users.Select(x => x).ToList();
 
         public User GetUser(string username)

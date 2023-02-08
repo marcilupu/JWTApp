@@ -5,6 +5,7 @@ using AuthServer.Utils;
 using Azure.Core;
 using JWTManager;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.Net.Http.Headers;
 using System.Net.Http.Headers;
@@ -15,14 +16,14 @@ namespace AuthServer.Controllers
     [Route("[controller]")]
     public class UserController : Controller
     {
+
         [HttpPost]
         public void AddUser([FromServices] UserRepository userRepository, string username, string password)
         {
             string salt = PasswordHandler.GenerateSalt();
             string passwordhash = PasswordHandler.ComputePassword(password, salt);
 
-            List<User> users = userRepository.GetAll();
-            if (users.Any(users => users.Username == username))
+            if (userRepository.Any(username))
             {
                 throw new Exception("A username with this name already exists");
             }
@@ -65,13 +66,15 @@ namespace AuthServer.Controllers
             //}
 
             //if valid generate jwt cu username ul respectiv, post, redirect
-            string token = jwtManager.GenerateJwt(loginForm.Username, DateTime.Now.AddMinutes(20));
+            //string token = jwtManager.GenerateJwt(loginForm.Username, DateTime.Now.AddMinutes(20));
 
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var response = await client.PostAsync(loginForm.RedirectUrl, null);
+            //using var client = new HttpClient();
+            //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            //var response = await client.PostAsync(loginForm.RedirectUrl, null);
 
-            return new RedirectResult(loginForm.RedirectUrl);
+            //HttpContext.Response.Headers.Authorization = new StringValues(new[] { "Bearer", token });
+
+            return Redirect(loginForm.RedirectUrl + "?authorizationCode=" + Guid.NewGuid().ToString());
             //if not valid warning in view credentiale incorecte
         }
     }
