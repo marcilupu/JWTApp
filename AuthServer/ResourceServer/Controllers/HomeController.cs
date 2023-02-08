@@ -20,6 +20,10 @@ namespace ResourceServer.Controllers
 
         public IActionResult Privacy()
         {
+            //if(jwt) and jwt is valid
+            //return Privacy
+            //if is not valid return BadRequest
+            //else return Redirect()
             return View();
         }
 
