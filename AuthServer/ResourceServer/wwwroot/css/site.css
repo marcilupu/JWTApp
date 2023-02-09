@@ -75,7 +75,28 @@ body {
         transition: .5s;
     }
 
+.center-box .logout a {
+    place-content: center;
+    width: 200px;
+    height: 50px;
+    border: 1px solid;
+    padding-top: 10px;
+    background: #f65442;
+    border-radius: 25px;
+    font-size: 18px;
+    color: #e9f4fb;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+    margin: 50px auto;
+    justify-content: center;
+    display: flex;
+}
 
+.center-box .logout a:hover {
+    border-color: #f76f60;
+    transition: .5s;
+}
 
 .spinning-jwt {
     display: flex;
