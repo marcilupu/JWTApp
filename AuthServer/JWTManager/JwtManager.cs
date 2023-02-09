@@ -26,16 +26,16 @@ namespace JWTManager
         {
             // Cryptographic algorithm used for signature is RSA signature with SHA-256(RS256).
             string jwtHeaderJson = JsonConvert.SerializeObject(_jwtHeader);
-            string base64JwtHeader = Convert.ToBase64String(Encoding.UTF8.GetBytes(jwtHeaderJson));
+            string base64JwtHeader = Utils.Base64Url.ToBase64Url(Encoding.UTF8.GetBytes(jwtHeaderJson));
 
             JwtPayload jwtPayload = new JwtPayload() { Username = username, ExpiresAt = expiresAt };
             string jwtPayloadJson = JsonConvert.SerializeObject(jwtPayload);
-            string base64JwtPayload = Convert.ToBase64String(Encoding.UTF8.GetBytes(jwtPayloadJson));
+            string base64JwtPayload = Utils.Base64Url.ToBase64Url(Encoding.UTF8.GetBytes(jwtPayloadJson));
 
             byte[] dataToSign = Encoding.ASCII.GetBytes(base64JwtHeader + "." + base64JwtPayload);
 
             byte[] signature = _certificate.GetRSAPrivateKey()!.SignData(dataToSign, _algorithm, _padding);
-            string base64jwtSignature = Convert.ToBase64String(signature);
+            string base64jwtSignature = Utils.Base64Url.ToBase64Url(signature);
 
             string token = base64JwtHeader + "." + base64JwtPayload + "." + base64jwtSignature;
 
@@ -51,14 +51,14 @@ namespace JWTManager
             string base64JwtSignature = tokenData[2];
 
             byte[] dataToVerify = Encoding.ASCII.GetBytes(base64JwtHeader + "." + base64JwtPayload);
-            byte[] signedData = Convert.FromBase64String(base64JwtSignature);
+            byte[] signedData = Utils.Base64Url.FromBase64Url(base64JwtSignature);
 
             bool isValid = _certificate.GetRSAPublicKey()!.VerifyData(dataToVerify, signedData, _algorithm, _padding);
 
             // if the token isValid the payload cannot be null
             if (isValid)
             {
-                string jwtPayloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(base64JwtPayload));
+                string jwtPayloadJson = Encoding.UTF8.GetString(Utils.Base64Url.FromBase64Url(base64JwtPayload));
                 JwtPayload jwtPayload = (JwtPayload)JsonConvert.DeserializeObject(jwtPayloadJson, typeof(JwtPayload))!;
                 return (jwtPayload.ExpiresAt > DateTime.Now) ? true : false;
             }
@@ -71,7 +71,7 @@ namespace JWTManager
         public JwtPayload GetPayload(string token)
         {
             string base64JwtPayload = token.Split('.')[1];
-            string jwtPayloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(base64JwtPayload));
+            string jwtPayloadJson = Encoding.UTF8.GetString(Utils.Base64Url.FromBase64Url(base64JwtPayload));
             JwtPayload jwtPayload = (JwtPayload)JsonConvert.DeserializeObject(jwtPayloadJson, typeof(JwtPayload))!;
             return jwtPayload;
         }
