@@ -28,7 +28,7 @@ namespace ResourceServer.Filters
                 // If authorization code is null, redirect the user to the login page.
                 if (authQueryCode == null)
                 {
-                    Redirect(context, redirectUrl);
+                    Redirect(context, "/home/index");
                     return;
                 }
 

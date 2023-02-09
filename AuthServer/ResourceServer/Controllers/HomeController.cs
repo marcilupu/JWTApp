@@ -18,11 +18,26 @@ namespace ResourceServer.Controllers
         public async Task<IActionResult> Privacy()
         {
             var token = HttpContext.Items["jwt"];
+            string username = "Ionut_test";
 
             // aici ar trebui o deserializare facuta la token ca sa fie afisat username-ul in view.
 
-            return View();             
+            return View("/Views/Home/Privacy.cshtml", username);             
         }
 
+        [HttpGet]
+        public IActionResult Logout()
+        {
+            if (HttpContext.Request.Cookies["Jwt"] != null)
+            {
+                //HttpContext.Response.Cookies["Jwt"].Expires = DateTime.Now.AddDays(-1);
+
+                HttpContext.Response.Cookies.Append("Jwt", "", new CookieOptions()
+                {
+                    Expires = DateTime.Now.AddDays(-1)
+                });
+            }
+            return View("/Views/Home/Index.cshtml");
+        }
     }
 }
