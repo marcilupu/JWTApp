@@ -1,18 +1,87 @@
-html {
-  font-size: 14px;
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Poppins:wght@400;500;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
 
-html {
-  position: relative;
-  min-height: 100%;
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(120deg,#0e1f2b, #8e44ad);
+    height: 100vh;
+    overflow: hidden;
 }
+
+.center-box {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 420px;
+    border-radius: 10px;
+}
+
+    .center-box h1 {
+        text-align: center;
+        background: white;
+        padding: 20px 1px;
+        border-radius: 10px;
+    }
+
+    .center-box .login-window {
+        text-align: center;
+        height: 300px;
+        background: white;
+        padding: 20px 0;
+        border-radius: 10px;
+    }
+
+    .center-box .login-window p{
+        font-size:22px;
+    }
+
+    .center-box .login-window a {
+        display:inline-flex;
+        place-content:center;
+        width:250px;
+        height: 50px;
+        border: 1px solid;
+        padding-top:10px;
+        background: #2691d9;
+        border-radius: 25px;
+        font-size: 18px;
+        color: #e9f4fb;
+        font-weight: 700;
+        cursor: pointer;
+        outline: none;
+        margin-bottom: 20px;
+    }
+
+    .center-box .login-window a:hover {
+        border-color: #2691d9;
+        transition: .5s;
+    }
+
+
+
+.spinning-jwt {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+    margin-top: 20px;
+    animation: spin 10s linear infinite;
+}
+
