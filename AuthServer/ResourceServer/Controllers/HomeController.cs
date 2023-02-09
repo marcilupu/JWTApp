@@ -1,5 +1,4 @@
 ﻿using JWTManager;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ResourceServer.Filters;
 
@@ -28,8 +27,6 @@ namespace ResourceServer.Controllers
         {
             if (HttpContext.Request.Cookies["Jwt"] != null)
             {
-                //HttpContext.Response.Cookies["Jwt"].Expires = DateTime.Now.AddDays(-1);
-
                 HttpContext.Response.Cookies.Append("Jwt", "", new CookieOptions()
                 {
                     Expires = DateTime.Now.AddDays(-1)
