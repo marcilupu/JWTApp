@@ -8,7 +8,7 @@ builder.Services.AddCors();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 var certPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\cert.cer"));
-builder.Services.AddSingleton<IJwtManager, JwtManager>(service => new JwtManager(new X509Certificate2(certPath, "1234")));
+builder.Services.AddSingleton<IJwtManager, JwtManager>(service => new JwtManager(new X509Certificate2(certPath)));
 
 var app = builder.Build();
 
