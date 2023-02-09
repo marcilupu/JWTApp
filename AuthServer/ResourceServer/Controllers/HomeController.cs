@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ResourceServer.Filters;
-using ResourceServer.Utils;
-using System.Net.Http;
 
 namespace ResourceServer.Controllers
 {

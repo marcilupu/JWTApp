@@ -15,7 +15,10 @@ namespace ResourceServer.Filters
             var httpContext = context.HttpContext;
             // Get the jwt from the cookie (if exists).
             var token = httpContext.Request.Cookies["Jwt"];
-
+     
+            string requestUrl = $"https://localhost:7109{httpContext.Request.Path}";
+            string redirectUrl = $"https://localhost:7186/User/login?redirectUrl={requestUrl}";
+        
             // Check if the kwt is in the cookie
             // If it is not, make a request to the authServer to  get the jwt token.
             if (string.IsNullOrEmpty(token))
@@ -25,7 +28,7 @@ namespace ResourceServer.Filters
                 // If authorization code is null, redirect the user to the login page.
                 if (authQueryCode == null)
                 {
-                    Redirect(context, "/home/index");
+                    Redirect(context, redirectUrl);
                     return;
                 }
 
@@ -45,7 +48,7 @@ namespace ResourceServer.Filters
 
             if (string.IsNullOrEmpty(token) || !jwtManager.ValidateJwt(token))
             {
-                Redirect(context, "/home/index");
+                Redirect(context, redirectUrl);
                 return;
             }
 
