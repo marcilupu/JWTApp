@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JWTManager\JWTManager.csproj" />
+    <ProjectReference Include="..\ResourceServer\ResourceServer.csproj" />
   </ItemGroup>
 
 </Project>

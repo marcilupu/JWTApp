@@ -15,13 +15,13 @@ namespace ResourceServer.Controllers
         }
 
         [JwtAuthorization]
-        public async Task<IActionResult> Privacy()
+        public IActionResult Privacy([FromServices] IJwtManager jwtManager)
         {
-            var token = HttpContext.Items["jwt"];
-            string username = "Ionut_test";
+            // the token cannot be null if the JwtAuthorization has been performed
+            string token = (string)HttpContext.Items["jwt"]!;
 
-            // aici ar trebui o deserializare facuta la token ca sa fie afisat username-ul in view.
-
+            var username = jwtManager.GetPayload(token).Username;
+            
             return View("/Views/Home/Privacy.cshtml", username);             
         }
 

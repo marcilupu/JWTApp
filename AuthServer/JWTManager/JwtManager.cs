@@ -67,5 +67,13 @@ namespace JWTManager
                 return false;
             }
         }
+
+        public JwtPayload GetPayload(string token)
+        {
+            string base64JwtPayload = token.Split('.')[1];
+            string jwtPayloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(base64JwtPayload));
+            JwtPayload jwtPayload = (JwtPayload)JsonConvert.DeserializeObject(jwtPayloadJson, typeof(JwtPayload))!;
+            return jwtPayload;
+        }
     }
 }
