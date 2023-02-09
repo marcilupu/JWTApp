@@ -8,6 +8,15 @@ namespace ResourceServer.Controllers
     {
         public IActionResult Index()
         {
+            if (HttpContext.Request.Cookies["Jwt"] != null ? true : false)
+            {
+                return new RedirectToActionResult("Logout", null, null);
+            }
+            return View();
+        }
+
+        public IActionResult NoPrivacy([FromServices] IJwtManager jwtManager)
+        {
             return View();
         }
 
